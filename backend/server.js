@@ -1,10 +1,10 @@
 require('dotenv').config();
 const http = require('http');
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const { hasFirebaseConfig } = require('./config/firebase');
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -44,15 +44,10 @@ app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/signup', authLimiter);
 
 // ============ DATABASE CONNECTION ============
-if (!process.env.MONGODB_URI) {
-  console.warn('⚠️  MONGODB_URI is not set. Database connection skipped.');
+if (hasFirebaseConfig) {
+  console.log('✅ Firebase Firestore configured');
 } else {
-  mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-  .then(() => console.log('✅ MongoDB Connected'))
-  .catch(err => console.error('❌ MongoDB Connection Error:', err));
+  console.warn('⚠️  Firebase credentials are not set. Add FIREBASE_PROJECT_ID and service account credentials.');
 }
 
 // ============ API ROUTES ============
