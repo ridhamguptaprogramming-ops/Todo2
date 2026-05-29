@@ -2,9 +2,29 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const User = require('../models/User');
+const { admin } = require('../config/firebase');
 const { sendVerificationEmail, sendNotificationEmail } = require('../services/emailService');
 
 const router = express.Router();
+
+const createSession = (user) => {
+  const token = jwt.sign(
+    { id: user._id, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: process.env.JWT_EXPIRY || '7d' }
+  );
+
+  return {
+    token,
+    user: {
+      id: user._id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role
+    }
+  };
+};
 
 // ============ SIGNUP ============
 router.post('/signup', async (req, res) => {
@@ -146,29 +166,77 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Generate JWT
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRY || '7d' }
-    );
+    const session = createSession(user);
 
     res.json({
       success: true,
       message: 'Login successful',
-      token,
-      user: {
-        id: user._id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        role: user.role
-      }
+      ...session
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: 'Error during login',
+      error: error.message
+    });
+  }
+});
+
+// ============ GOOGLE LOGIN ============
+router.post('/google', async (req, res) => {
+  try {
+    const { idToken } = req.body;
+
+    if (!idToken) {
+      return res.status(400).json({
+        success: false,
+        message: 'Google ID token is required'
+      });
+    }
+
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const email = decodedToken.email?.toLowerCase();
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Google account email is required'
+      });
+    }
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      const [firstName = 'Google', ...lastNameParts] = (decodedToken.name || '').trim().split(/\s+/);
+      user = new User({
+        email,
+        firstName,
+        lastName: lastNameParts.join(' ') || 'User',
+        isVerified: decodedToken.email_verified !== false,
+        role: email === process.env.ADMIN_EMAIL ? 'admin' : 'user',
+        profileImage: decodedToken.picture,
+        firebaseUid: decodedToken.uid,
+        authProvider: 'google'
+      });
+      await user.save();
+    } else {
+      user.firebaseUid = user.firebaseUid || decodedToken.uid;
+      user.profileImage = decodedToken.picture || user.profileImage;
+      user.isVerified = true;
+      await user.save();
+    }
+
+    const session = createSession(user);
+
+    res.json({
+      success: true,
+      message: 'Google login successful',
+      ...session
+    });
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      message: 'Google login failed',
       error: error.message
     });
   }

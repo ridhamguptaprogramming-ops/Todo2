@@ -1,4 +1,4 @@
-const API_BASE = localStorage.getItem('apiBase') || 'http://localhost:5000/api';
+const API_BASE = localStorage.getItem('apiBase') || `${window.location.protocol}//${window.location.hostname}:5000/api`;
 
 const state = {
   token: localStorage.getItem('token'),
@@ -10,14 +10,19 @@ const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => document.querySelectorAll(selector);
 
 const request = async (path, options = {}) => {
-  const response = await fetch(`${API_BASE}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(state.token ? { Authorization: `Bearer ${state.token}` } : {}),
-      ...(options.headers || {})
-    }
-  });
+  let response;
+  try {
+    response = await fetch(`${API_BASE}${path}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(state.token ? { Authorization: `Bearer ${state.token}` } : {}),
+        ...(options.headers || {})
+      }
+    });
+  } catch (error) {
+    throw new Error(`Cannot reach backend at ${API_BASE}. Start the backend on port 5000.`);
+  }
 
   const contentType = response.headers.get('content-type') || '';
   const data = contentType.includes('application/json') ? await response.json() : await response.text();
@@ -136,6 +141,33 @@ const setupAuthTabs = () => {
 };
 
 const setupForms = () => {
+  $('#googleLoginButton').addEventListener('click', async () => {
+    try {
+      const firebaseConfig = window.FIREBASE_CONFIG || {};
+      if (!window.firebase || !firebaseConfig.apiKey) {
+        throw new Error('Add your Firebase Web API key in frontend/firebase-config.js');
+      }
+
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
+
+      const provider = new firebase.auth.GoogleAuthProvider();
+      const result = await firebase.auth().signInWithPopup(provider);
+      const idToken = await result.user.getIdToken();
+      const data = await request('/auth/google', {
+        method: 'POST',
+        body: JSON.stringify({ idToken })
+      });
+
+      saveSession(data.token, data.user);
+      toast(data.message);
+      await loadEvents();
+    } catch (error) {
+      toast(error.message);
+    }
+  });
+
   $('#loginForm').addEventListener('submit', async (event) => {
     event.preventDefault();
     try {
