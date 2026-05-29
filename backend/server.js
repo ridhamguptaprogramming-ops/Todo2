@@ -56,6 +56,11 @@ app.use('/api/events', eventRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/admin', adminRoutes);
 
+// ============ FRONTEND SHORTCUT ============
+app.get('/', (req, res) => {
+  res.redirect(process.env.FRONTEND_URL || 'http://localhost:3000');
+});
+
 // ============ HEALTH CHECK ============
 app.get('/api/health', (req, res) => {
   res.json({ 
