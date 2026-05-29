@@ -1,0 +1,26 @@
+{
+  "name": "event-attendance-website",
+  "version": "1.0.0",
+  "description": "Modern event attendance platform with animations and secure backend",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "npm run start:backend",
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend && npm start",
+    "dev": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "event",
+    "attendance",
+    "website",
+    "animation",
+    "gsap"
+  ],
+  "author": "ridhamguptaprogramming-ops",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  }
+}
