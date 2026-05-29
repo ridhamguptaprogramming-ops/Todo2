@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Event Attendance</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Event Attendance</p>
+        <h1>Manage events and check-ins</h1>
+      </div>
+      <div class="topbar-actions">
+        <button id="themeToggle" class="icon-button" title="Toggle theme" type="button">◐</button>
+        <button id="logoutButton" class="ghost hidden" type="button">Logout</button>
+      </div>
+    </header>
+
+    <main class="shell">
+      <section class="panel auth-panel" id="authPanel">
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-auth-tab="login" type="button">Login</button>
+          <button class="tab" data-auth-tab="signup" type="button">Signup</button>
+          <button class="tab" data-auth-tab="verify" type="button">Verify</button>
+        </div>
+
+        <form id="loginForm" class="stack auth-form">
+          <label>Email<input name="email" type="email" autocomplete="email" required /></label>
+          <label>Password<input name="password" type="password" autocomplete="current-password" required /></label>
+          <button type="submit">Login</button>
+        </form>
+
+        <form id="signupForm" class="stack auth-form hidden">
+          <div class="grid two">
+            <label>First name<input name="firstName" required /></label>
+            <label>Last name<input name="lastName" required /></label>
+          </div>
+          <label>Email<input name="email" type="email" autocomplete="email" required /></label>
+          <label>Phone<input name="phone" inputmode="numeric" maxlength="10" /></label>
+          <label>Password<input name="password" type="password" autocomplete="new-password" minlength="6" required /></label>
+          <button type="submit">Create account</button>
+        </form>
+
+        <form id="verifyForm" class="stack auth-form hidden">
+          <label>Verification token<input name="token" required /></label>
+          <button type="submit">Verify email</button>
+        </form>
+      </section>
+
+      <section class="workspace">
+        <div class="toolbar">
+          <div class="filters">
+            <input id="searchInput" placeholder="Search events" />
+            <select id="categoryFilter">
+              <option value="">All categories</option>
+              <option value="conference">Conference</option>
+              <option value="workshop">Workshop</option>
+              <option value="webinar">Webinar</option>
+              <option value="festival">Festival</option>
+              <option value="meetup">Meetup</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <button id="refreshEvents" class="ghost" type="button">Refresh</button>
+        </div>
+
+        <div id="eventGrid" class="event-grid"></div>
+      </section>
+
+      <aside class="side-rail">
+        <section class="panel">
+          <h2>Session</h2>
+          <div id="sessionInfo" class="muted">Login to register for events.</div>
+        </section>
+
+        <section id="adminPanel" class="panel hidden">
+          <h2>Admin</h2>
+          <form id="eventForm" class="stack compact">
+            <label>Title<input name="title" required /></label>
+            <label>Description<textarea name="description" required></textarea></label>
+            <div class="grid two">
+              <label>Date<input name="date" type="date" required /></label>
+              <label>Capacity<input name="capacity" type="number" min="1" required /></label>
+            </div>
+            <label>Venue<input name="venueName" required /></label>
+            <label>Category
+              <select name="category">
+                <option value="conference">Conference</option>
+                <option value="workshop">Workshop</option>
+                <option value="webinar">Webinar</option>
+                <option value="festival">Festival</option>
+                <option value="meetup">Meetup</option>
+                <option value="other">Other</option>
+              </select>
+            </label>
+            <button type="submit">Create event</button>
+          </form>
+
+          <form id="checkinForm" class="stack compact">
+            <label>Check-in ID<input name="uniqueId" required /></label>
+            <button class="secondary" type="submit">Check in</button>
+          </form>
+        </section>
+      </aside>
+    </main>
+
+    <div id="toast" class="toast hidden"></div>
+    <script src="./app.js"></script>
+  </body>
+</html>
