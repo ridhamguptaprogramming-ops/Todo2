@@ -4,6 +4,7 @@ const path = require('path');
 
 const publicDir = __dirname;
 const port = process.env.FRONTEND_PORT || 3000;
+const host = process.env.HOST || '127.0.0.1';
 
 const mimeTypes = {
   '.html': 'text/html; charset=utf-8',
@@ -43,6 +44,6 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(port, () => {
-  console.log(`Frontend running on http://localhost:${port}`);
+server.listen(port, host, () => {
+  console.log(`Frontend running on http://${host}:${port}`);
 });

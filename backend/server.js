@@ -83,9 +83,11 @@ app.use(errorHandler);
 
 // ============ START SERVER ============
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`\n🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📡 API Base: http://localhost:${PORT}/api`);
+const HOST = process.env.HOST || '127.0.0.1';
+
+app.listen(PORT, HOST, () => {
+  console.log(`\n🚀 Server running on http://${HOST}:${PORT}`);
+  console.log(`📡 API Base: http://${HOST}:${PORT}/api`);
   console.log(`🔐 Environment: ${process.env.NODE_ENV}\n`);
 });
 

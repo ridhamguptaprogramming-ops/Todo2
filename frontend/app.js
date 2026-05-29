@@ -60,7 +60,7 @@ const renderSession = () => {
   $('#adminPanel').classList.toggle('hidden', !isAdmin);
 
   $('#sessionInfo').innerHTML = state.user
-    ? `<strong>${state.user.firstName} ${state.user.lastName}</strong><br><span class="muted">${state.user.email} · ${state.user.role}</span>`
+    ? `<strong>${state.user.firstName} ${state.user.lastName}</strong><br><span class="muted">${state.user.email} - ${state.user.role}</span>`
     : 'Login to register for events.';
 };
 
