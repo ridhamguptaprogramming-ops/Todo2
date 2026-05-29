@@ -1,4 +1,5 @@
 require('dotenv').config();
+const http = require('http');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -85,11 +86,7 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST || '127.0.0.1';
 
-const server = app.listen(PORT, HOST, () => {
-  console.log(`\n🚀 Server running on http://${HOST}:${PORT}`);
-  console.log(`📡 API Base: http://${HOST}:${PORT}/api`);
-  console.log(`🔐 Environment: ${process.env.NODE_ENV}\n`);
-});
+const server = http.createServer(app);
 
 server.on('error', (error) => {
   if (error.code === 'EADDRINUSE') {
@@ -98,6 +95,12 @@ server.on('error', (error) => {
   }
 
   throw error;
+});
+
+server.listen(PORT, HOST, () => {
+  console.log(`\n🚀 Server running on http://${HOST}:${PORT}`);
+  console.log(`📡 API Base: http://${HOST}:${PORT}/api`);
+  console.log(`🔐 Environment: ${process.env.NODE_ENV}\n`);
 });
 
 module.exports = app;
