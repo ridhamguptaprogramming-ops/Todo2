@@ -43,12 +43,16 @@ app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/signup', authLimiter);
 
 // ============ DATABASE CONNECTION ============
-mongoose.connect(process.env.MONGODB_URI, {
+if (!process.env.MONGODB_URI) {
+  console.warn('⚠️  MONGODB_URI is not set. Database connection skipped.');
+} else {
+  mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
   .then(() => console.log('✅ MongoDB Connected'))
   .catch(err => console.error('❌ MongoDB Connection Error:', err));
+}
 
 // ============ API ROUTES ============
 app.use('/api/auth', authRoutes);

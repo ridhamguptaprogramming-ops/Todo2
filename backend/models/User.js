@@ -43,10 +43,7 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  updatedAt: {
-    type: Date,
-    default: Date.now
-  }
+  updatedAt: Date
 });
 
 // Hash password before saving
@@ -66,5 +63,10 @@ userSchema.pre('save', async function(next) {
 userSchema.methods.matchPassword = async function(enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
+
+userSchema.pre('save', function(next) {
+  this.updatedAt = new Date();
+  next();
+});
 
 module.exports = mongoose.model('User', userSchema);
