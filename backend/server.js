@@ -85,10 +85,19 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST || '127.0.0.1';
 
-app.listen(PORT, HOST, () => {
+const server = app.listen(PORT, HOST, () => {
   console.log(`\n🚀 Server running on http://${HOST}:${PORT}`);
   console.log(`📡 API Base: http://${HOST}:${PORT}/api`);
   console.log(`🔐 Environment: ${process.env.NODE_ENV}\n`);
+});
+
+server.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use. Stop the existing server or run with PORT=5001.`);
+    process.exit(1);
+  }
+
+  throw error;
 });
 
 module.exports = app;

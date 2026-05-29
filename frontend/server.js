@@ -44,6 +44,15 @@ const server = http.createServer((req, res) => {
   });
 });
 
+server.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    console.error(`Port ${port} is already in use. Stop the existing server or run with FRONTEND_PORT=3001.`);
+    process.exit(1);
+  }
+
+  throw error;
+});
+
 server.listen(port, host, () => {
   console.log(`Frontend running on http://${host}:${port}`);
 });
